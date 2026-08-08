@@ -344,22 +344,22 @@ Terraform requires an S3 bucket to store its state file. This bucket must exist 
 
 ### 5.1 Create the S3 Bucket
 
-Replace `YOUR-GITHUB-USERNAME` with your actual GitHub username to make the bucket name unique.
+Replace `ravibhadarge` with your actual GitHub username to make the bucket name unique.
 
 ```bash
 # Create the bucket
 aws s3api create-bucket \
-  --bucket zen-pharma-terraform-state-YOUR-GITHUB-USERNAME \
+  --bucket zen-pharma-terraform-state-ravibhadarge \
   --region us-east-1
 
 # Enable versioning (allows state rollback)
 aws s3api put-bucket-versioning \
-  --bucket zen-pharma-terraform-state-YOUR-GITHUB-USERNAME \
+  --bucket zen-pharma-terraform-state-ravibhadarge \
   --versioning-configuration Status=Enabled
 
 # Enable encryption
 aws s3api put-bucket-encryption \
-  --bucket zen-pharma-terraform-state-YOUR-GITHUB-USERNAME \
+  --bucket zen-pharma-terraform-state-ravibhadarge \
   --server-side-encryption-configuration '{
     "Rules": [{
       "ApplyServerSideEncryptionByDefault": {
@@ -370,7 +370,7 @@ aws s3api put-bucket-encryption \
 
 # Block all public access
 aws s3api put-public-access-block \
-  --bucket zen-pharma-terraform-state-YOUR-GITHUB-USERNAME \
+  --bucket zen-pharma-terraform-state-ravibhadarge \
   --public-access-block-configuration \
     "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 ```
@@ -378,7 +378,7 @@ aws s3api put-public-access-block \
 ### 5.2 Verify the Bucket
 
 ```bash
-aws s3 ls s3://zen-pharma-terraform-state-YOUR-GITHUB-USERNAME
+aws s3 ls s3://zen-pharma-terraform-state-ravibhadarge
 # Should return empty (no error)
 ```
 
@@ -394,7 +394,7 @@ aws s3 ls s3://zen-pharma-terraform-state-YOUR-GITHUB-USERNAME
 4. Clone your fork locally:
 
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/zen-infra.git
+git clone https://github.com/ravibhadarge/zen-infra.git
 cd zen-infra
 ```
 
@@ -412,7 +412,7 @@ Update the bucket name in all three environment backend files:
 ```hcl
 terraform {
   backend "s3" {
-    bucket       = "zen-pharma-terraform-state-YOUR-GITHUB-USERNAME"
+    bucket       = "zen-pharma-terraform-state-ravibhadarge"
     key          = "envs/dev/terraform.tfstate"
     region       = "us-east-1"
     encrypt      = true
@@ -433,7 +433,7 @@ In `envs/dev/variables.tf`, update the default value for `github_org`:
 variable "github_org" {
   description = "GitHub username or organization"
   type        = string
-  default     = "YOUR-GITHUB-USERNAME"   # ← change this
+  default     = "ravibhadarge"   # ← change this
 }
 ```
 
@@ -449,7 +449,7 @@ In `.github/workflows/terraform.yml`, update the `github_org` value:
     terraform plan \
       -var="db_password=${{ secrets.DEV_DB_PASSWORD }}" \
       -var="jwt_secret=${{ secrets.DEV_JWT_SECRET }}" \
-      -var="github_org=YOUR-GITHUB-USERNAME" \    # ← change this
+      -var="github_org=ravibhadarge" \    # ← change this
       -out=tfplan \
       -no-color
 ```
@@ -696,7 +696,7 @@ How it works:
 4. CI uses these credentials to push images to ECR
 
 The role is restricted to:
-- Only `YOUR-GITHUB-USERNAME/zen-pharma-frontend` and `YOUR-GITHUB-USERNAME/zen-pharma-backend` repos
+- Only `ravibhadarge/zen-pharma-frontend` and `ravibhadarge/zen-pharma-backend` repos
 - Only `main` and `develop` branches
 
 ---
@@ -809,7 +809,7 @@ terraform init
 terraform destroy \
   -var="db_password=dummy" \
   -var="jwt_secret=dummy" \
-  -var="github_org=YOUR-GITHUB-USERNAME"
+  -var="github_org=ravibhadarge"
 ```
 
 Type `yes` when prompted.
@@ -820,11 +820,11 @@ The S3 state bucket is **not** deleted by Terraform destroy — it is managed se
 
 ```bash
 # Empty the bucket first
-aws s3 rm s3://zen-pharma-terraform-state-YOUR-GITHUB-USERNAME --recursive
+aws s3 rm s3://zen-pharma-terraform-state-ravibhadarge --recursive
 
 # Delete the bucket
 aws s3api delete-bucket \
-  --bucket zen-pharma-terraform-state-YOUR-GITHUB-USERNAME \
+  --bucket zen-pharma-terraform-state-ravibhadarge \
   --region us-east-1
 ```
 
